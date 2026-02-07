@@ -1,6 +1,6 @@
 # Business Wallet Requirements Specification
 
-**Version:** 0.2.0  
+**Version:** 0.3.0  
 **Last Updated:** 2026-02-07  
 **Status:** Draft
 
@@ -64,6 +64,70 @@ The Business Wallet is a versatile communication tool designed for organizations
 
 ---
 
+### FR-0006: Credential Issuance
+**Description:** The system shall enable organizations to issue digital credentials to subjects (individuals, organizations, or other entities). Credentials are issued directly by the organization that owns the wallet; delegation or proxy issuance on behalf of other organizations is not supported.
+
+**User Story:**  
+As an organization administrator, I want to issue digital credentials to employees, partners, or customers so that they can prove their relationship or qualifications to third parties.
+
+**Acceptance Criteria:**  
+- Given an authorized user, when they create a credential, then the credential is signed with the organization's cryptographic keys
+- Given a credential template, when a user issues a credential, then all required claims are populated
+- Given an issuance request, when the credential is created, then it is stored and made available to the holder
+
+**Priority:** Critical  
+**Status:** Proposed
+
+---
+
+### FR-0007: Credential Type Agnosticism
+**Description:** The system shall be agnostic to credential types and support any credential schema. The system shall not be limited to predefined credential types but shall allow organizations to define and use custom credential schemas for any use case (employment verification, professional certifications, business certifications, legal documents, supplier qualifications, etc.).
+
+**User Story:**  
+As an organization administrator, I want to define custom credential schemas so that I can issue credentials for any business need without system limitations.
+
+**Acceptance Criteria:**  
+- Given any valid credential schema, when an organization configures it, then the system accepts and stores the schema
+- Given a custom schema, when a credential is issued using it, then the credential conforms to the schema structure
+- Given multiple credential types, when viewing the wallet, then all types are displayed uniformly
+
+**Priority:** High  
+**Status:** Proposed
+
+---
+
+### FR-0008: Selective Disclosure
+**Description:** The system shall support selective disclosure, allowing credential holders to share only specific claims from a credential without revealing the entire credential content. This enables privacy-preserving presentations where holders can prove specific attributes (e.g., "over 18") without disclosing unnecessary information (e.g., exact birthdate).
+
+**User Story:**  
+As a credential holder, I want to share only specific claims from my credential so that I can prove what is necessary without revealing my complete personal data.
+
+**Acceptance Criteria:**  
+- Given a credential with multiple claims, when presenting to a verifier, then the holder can select which claims to disclose
+- Given a selective disclosure request, when the presentation is created, then undisclosed claims are cryptographically hidden
+- Given a selectively disclosed credential, when verified, then only the disclosed claims are visible to the verifier
+
+**Priority:** High  
+**Status:** Proposed
+
+---
+
+### FR-0009: Credential Revocation
+**Description:** The system shall support credential revocation, allowing issuers to invalidate previously issued credentials. Revocation status shall be verifiable by relying parties.
+
+**User Story:**  
+As a credential issuer, I want to revoke a credential I previously issued so that relying parties know it is no longer valid.
+
+**Acceptance Criteria:**  
+- Given an issued credential, when the issuer revokes it, then the revocation is recorded
+- Given a revoked credential, when a verifier checks its status, then the revocation is detectable
+- Given a revocation event, when it occurs, then an audit trail is maintained
+
+**Priority:** Medium  
+**Status:** Proposed
+
+---
+
 ## Technical Requirements
 
 ### TR-0001: Unified Deployment Architecture
@@ -120,6 +184,49 @@ The Business Wallet is a versatile communication tool designed for organizations
 
 ---
 
+### TR-0006: Multi-Format Credential Support
+**Description:** The system shall support multiple credential format standards:
+- **SD-JWT VC (Selective Disclosure JWT Verifiable Credentials):** JSON-based credentials with built-in selective disclosure capabilities
+- **W3C Verifiable Credentials Data Model (VC DM):** JSON-LD based credentials following the W3C standard
+
+The system shall be capable of issuing, storing, presenting, and verifying credentials in both formats. Format selection shall be configurable per credential type or issuance.
+
+**Rationale:** Supporting both SD-JWT VC and W3C VC DM ensures interoperability with different ecosystems. SD-JWT VC provides efficient selective disclosure, while W3C VC DM offers semantic interoperability through JSON-LD.
+
+**Priority:** Critical  
+**Status:** Proposed
+
+---
+
+### TR-0007: Cryptographic Verification
+**Description:** Credential verification shall rely primarily on cryptographic proof validation. The system shall verify credentials by:
+- Validating digital signatures against the issuer's public key
+- Checking credential integrity (tamper detection)
+- Verifying proof formats (e.g., JWS, Data Integrity Proofs)
+
+Verification shall be self-contained and not require real-time communication with the issuer for basic validity checks.
+
+**Rationale:** Cryptographic verification provides offline capability, reduces latency, and maintains privacy by not notifying issuers of verification events.
+
+**Priority:** Critical  
+**Status:** Proposed
+
+---
+
+### TR-0008: OpenID Federation Trust Establishment
+**Description:** The system shall support OpenID Federation for establishing trust between verifiers and issuers. This enables:
+- Dynamic discovery of issuer metadata and public keys
+- Hierarchical trust chains through trust anchors
+- Automated trust policy evaluation
+- Federation-based issuer validation
+
+**Rationale:** OpenID Federation provides a scalable, standards-based approach to trust establishment that supports cross-organizational and cross-border credential verification without requiring manual trust configuration.
+
+**Priority:** High  
+**Status:** Proposed
+
+---
+
 ## Glossary
 
 **Business Wallet:** A digital solution enabling organizations to manage, issue, store, share, and request verifiable credentials and documents.
@@ -151,4 +258,20 @@ The Business Wallet is a versatile communication tool designed for organizations
 **Multi-tenant:** Software architecture where a single instance serves multiple organizations (tenants) with logical data separation.
 
 **On-premises:** Software deployed and operated on the customer's own infrastructure rather than in the cloud.
+
+**SD-JWT VC (Selective Disclosure JWT Verifiable Credential):** A credential format based on JSON Web Tokens that supports selective disclosure of claims, allowing holders to reveal only specific attributes.
+
+**W3C VC DM (W3C Verifiable Credentials Data Model):** A W3C standard defining the data model for verifiable credentials using JSON-LD for semantic interoperability.
+
+**Selective Disclosure:** The capability for a credential holder to present only specific claims from a credential without revealing all contained information.
+
+**OpenID Federation:** A specification for establishing trust between parties in a federated manner, enabling dynamic discovery of metadata and trust chain validation.
+
+**Trust Anchor:** A trusted entity at the top of a trust chain that vouches for subordinate entities in a federation.
+
+**Credential Schema:** A formal definition of the structure and data types of claims within a credential.
+
+**Revocation:** The process by which an issuer invalidates a previously issued credential, making it no longer valid.
+
+**Cryptographic Proof:** Mathematical evidence that a credential was issued by a specific entity and has not been tampered with.
 
