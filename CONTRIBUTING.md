@@ -109,10 +109,17 @@ An issue is considered "Done" when all of the following criteria are satisfied. 
 - [ ] **Feature Flags:** Feature flags are in place for gradual rollout (if applicable)
 - [ ] **Observability:** Logging, tracing, and metrics are implemented
 
+### Acceptance Testing Checklist
+
+- [ ] **Acceptance Testing Instructions Added:** A comment has been added to the issue explaining how a reviewer or product owner can manually test and verify the implemented functionality
+- [ ] **Test Scenarios Documented:** The comment includes specific scenarios to test, including happy path and edge cases
+- [ ] **Expected Results Described:** The comment clearly describes the expected behavior or outcome for each test scenario
+- [ ] **Prerequisites Listed:** Any prerequisites (test data, configuration, environment setup) needed for acceptance testing are documented in the comment
+
 ### Final Verification
 
 - [ ] **Acceptance Criteria Met:** All acceptance criteria from the issue are satisfied
-- [ ] **Acceptance Testing Instructions:** The issue has a comment explaining how a reviewer can test the functionality or otherwise test the issue for accepting it
+- [ ] **Acceptance Testing Checklist Complete:** All items in the Acceptance Testing Checklist above are satisfied
 - [ ] **Product Owner Approval:** Changes have been reviewed and approved by product owner
 - [ ] **No Regressions:** No regressions in existing functionality
 
