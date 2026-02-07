@@ -1,6 +1,6 @@
 # Business Wallet Architecture
 
-**Version:** 0.1.0  
+**Version:** 0.2.0  
 **Last Updated:** 2026-02-07  
 **Status:** Draft
 
@@ -117,6 +117,24 @@ The system shall implement multi-tenancy using logical isolation within a shared
 Asynchronous operations (batch credential issuance, document delivery notifications, audit logging) shall be handled through an event-driven architecture. A message queue (such as Redis Streams or RabbitMQ) shall decouple producers from consumers, enabling reliable processing, retry mechanisms, and horizontal scaling of workers.
 
 *Alternatives considered:* Synchronous processing only (scalability limits), webhooks only (reliability concerns).
+
+---
+
+### AC-0013: Credo as SSI/Verifiable Credentials Framework
+
+**Description:**  
+Credo (credo-ts) shall be adopted as the foundational framework for Self-Sovereign Identity (SSI) and Verifiable Credentials functionality. Credo is an open-source TypeScript framework hosted by the OpenWallet Foundation, providing comprehensive support for credential issuance, storage, verification, and presentation. The framework offers native TypeScript implementation aligned with AC-0001 and AC-0002, built-in multi-tenancy support aligned with AC-0011, and industry-leading OpenID4VC protocol implementation aligned with AC-0010.
+
+Key capabilities provided by Credo include:
+- **Credential formats**: W3C Verifiable Credentials (JWT and JSON-LD), SD-JWT VC, AnonCreds
+- **Protocols**: OpenID4VC (OID4VCI, OID4VP), DIDComm v1/v2, Aries Interop Profiles
+- **DID methods**: did:web, did:key, did:cheqd, did:indy, and others via plugins
+- **Key management**: Flexible wallet and key management with support for hardware security modules
+- **European compliance**: Designed for eIDAS 2.0 and EU Digital Identity Wallet (EUDI) Architecture Reference Framework (ARF) compliance
+
+Credo's modular architecture (separate packages for core, Node.js, React Native) supports the system's requirement for web-based operation while preserving flexibility for future mobile extensions. The vendor-neutral governance under the OpenWallet Foundation ensures long-term sustainability and community-driven development.
+
+*Alternatives considered:* Veramo (more developer-friendly API but less mature eIDAS/EUDI compliance and multi-tenant support), walt.id (Kotlin/Java-based, would require API wrapper layer losing TypeScript type safety), SpruceKit (Rust-based with mobile-first focus, less suitable for web-based enterprise applications).
 
 ---
 
