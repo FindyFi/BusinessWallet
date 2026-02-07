@@ -73,7 +73,7 @@ Business Wallet is a digital wallet system for organizations that enables them t
 - Use camelCase for variables, functions, and methods
 - Use UPPER_SNAKE_CASE for constants
 - Use descriptive names that clearly indicate purpose
-- Prefix interfaces with `I` (e.g., `IUserRepository`)
+- Do not prefix interfaces (TypeScript allows interfaces and classes to coexist with the same name)
 
 ### Error Handling
 - Use structured error types with clear error codes

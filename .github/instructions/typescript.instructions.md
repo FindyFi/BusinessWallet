@@ -16,7 +16,7 @@ applyTo: "**/*.ts,**/*.tsx"
 
 - Use functional components with React hooks, not class components
 - Always type component props with an interface (e.g., `interface ButtonProps { ... }`)
-- Use `React.FC` sparingly - prefer explicit typing of props (better handling of children and generic props; more precise type inference)
+- Avoid `React.FC` - prefer explicit typing of props (better handling of children and generic props; more precise type inference)
 - Destructure props in the component parameters
 - Use `React.ReactNode` for children prop type
 - Ensure all event handlers have proper typing
