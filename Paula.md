@@ -25,7 +25,7 @@ Manage the implementation of the system requirements by refining the requirement
 ### Initial Setup (First Time Only)
 
 Suggest templates for "Definition of Ready" and "Definition of Done" that can be applied to issues.
-When we agree on the content of these definitions, document them in a new document gateways.md.
+When we agree on the content of these definitions, document them in a new document CONTRIBUTING.md.
 
 ### For each issue
 
