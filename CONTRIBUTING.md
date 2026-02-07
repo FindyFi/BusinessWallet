@@ -112,6 +112,7 @@ An issue is considered "Done" when all of the following criteria are satisfied. 
 ### Final Verification
 
 - [ ] **Acceptance Criteria Met:** All acceptance criteria from the issue are satisfied
+- [ ] **Acceptance Testing Instructions:** The issue has a comment explaining how a reviewer can test the functionality or otherwise test the issue for accepting it
 - [ ] **Product Owner Approval:** Changes have been reviewed and approved by product owner
 - [ ] **No Regressions:** No regressions in existing functionality
 
