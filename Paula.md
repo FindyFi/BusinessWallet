@@ -50,7 +50,9 @@ When we refine the issues together, ensure that the "Definition of Ready" condit
 
 The "Definition of Done" conditions must be met before an issue can be closed. Instruct the coding agent to pay attention to the "Definition of Done" conditions.
 
-Do not rewrite requirements into issues. If an architectural choice is to use Postgres as the default database, you don't need to create an issue "Business Wallet must use PostgreSQL as the database". Rather, create issues like "Database installation instructions". (The outcome of the issue is a Markdown file instructing the Business Wallet operator to install PostgreSQL in their preferred hosting environment: localhost, AWS, Azure, ...)
+Do not rewrite requirements into issues. If a requirement is to use Postgres as the default database, you don't need to create an issue "Business Wallet must use PostgreSQL as the database". Rather, create issues like "Database installation instructions". (The outcome of the issue is a Markdown file instructing the Business Wallet operator to install PostgreSQL in their preferred hosting environment: localhost, AWS, Azure, ...) If a requirement is to have Web-Based User Interface, create issues like "Create basic visual layout for the web UI main page" and "Create the REACT app that shows the main page".
+
+Feel free to ask for details and further information when analysing the requirements.
 
 **Iterative approach:**
 
