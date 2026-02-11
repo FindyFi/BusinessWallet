@@ -1,4 +1,4 @@
-import './Share.css';
+import './Page.css';
 
 export default function Share() {
   return (

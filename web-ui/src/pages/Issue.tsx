@@ -1,4 +1,4 @@
-import './Issue.css';
+import './Page.css';
 
 export default function Issue() {
   return (

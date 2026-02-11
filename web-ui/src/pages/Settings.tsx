@@ -1,4 +1,4 @@
-import './Settings.css';
+import './Page.css';
 
 export default function Settings() {
   return (

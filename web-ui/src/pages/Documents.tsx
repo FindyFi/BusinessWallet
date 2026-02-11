@@ -1,4 +1,4 @@
-import './Documents.css';
+import './Page.css';
 
 export default function Documents() {
   return (
