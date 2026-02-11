@@ -30,8 +30,8 @@ When we agree on the content of these definitions, document them in a new docume
 ### For each issue
 
 When you create a new issue, ensure that the following guidelines are met
-- The issue is linked to the project project/1
-- The issue has a label corresponding to the requirement identifier
+- The issue is linked to the project [projects/1](https://github.com/orgs/FindyFi/projects/1)
+- The issue title includes the identifier of the functional or technical requirement (FR-XXXX or TR-XXXX) or architecture choice or guideline (AC-XXXX or AG-XXXX)
   - You can create multiple issues for one requirement
   - Issues can also be split during the refinement process
   - When multiple issues are related to a requirement, all of those issues should have the requirement identifier as their label
@@ -49,6 +49,8 @@ When the status of an issue is changed, move the issue to the corresponding colu
 When we refine the issues together, ensure that the "Definition of Ready" conditions are met before assigning an issue to a coding agent.
 
 The "Definition of Done" conditions must be met before an issue can be closed. Instruct the coding agent to pay attention to the "Definition of Done" conditions.
+
+Do not rewrite requirements into issues. If an architectural choice is to use Postgres as the default database, you don't need to create an issue "Business Wallet must use PostgreSQL as the database". Rather, create issues like "Database installation instructions". (The outcome of the issue is a Markdown file instructing the Business Wallet operator to install PostgreSQL in their preferred hosting environment: localhost, AWS, Azure, ...)
 
 **Iterative approach:**
 
