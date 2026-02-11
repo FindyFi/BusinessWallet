@@ -12,12 +12,67 @@ Business Wallet is a digital wallet system for organizations that enables them t
 
 ## Getting Started
 
-### Prerequisites
+You can run the Business Wallet using either Docker (recommended) or directly with Node.js.
+
+### Option 1: Docker Setup (Recommended)
+
+#### Prerequisites
+
+- Docker (v20.10 or higher)
+- Docker Compose (v2.0 or higher)
+
+#### Quick Start
+
+1. Clone the repository and navigate to the project directory:
+
+```bash
+git clone https://github.com/FindyFi/BusinessWallet.git
+cd BusinessWallet
+```
+
+2. Start all services with a single command:
+
+**For Production:**
+```bash
+docker compose up -d
+```
+
+**For Development (with hot-reload):**
+```bash
+docker compose -f docker-compose.dev.yml up
+```
+
+3. Access the application:
+   - Web UI: `http://localhost:3000` (production) or `http://localhost:5173` (development)
+   - PostgreSQL: `localhost:5432` (for future backend integration)
+
+4. Stop the services:
+
+```bash
+docker compose down
+```
+
+To stop and remove volumes (database data):
+```bash
+docker compose down -v
+```
+
+#### Environment Variables
+
+Copy `.env.example` to `.env` and customize as needed:
+
+```bash
+cp .env.example .env
+```
+
+### Option 2: Manual Setup (Without Docker)
+
+#### Prerequisites
 
 - Node.js (v18 or higher)
 - npm (v9 or higher)
 
-### Installation and Running
+#### Installation and Running
 
 1. Navigate to the web UI directory:
 

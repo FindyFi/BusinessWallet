@@ -30,6 +30,22 @@ npm install
 
 ## Development
 
+### Using Docker (Recommended)
+
+From the repository root:
+
+```bash
+# Start development environment with hot-reload
+docker compose -f docker-compose.dev.yml up web-ui-dev
+
+# Or use the shorthand if only running web-ui
+docker compose -f docker-compose.dev.yml up
+```
+
+The application will be available at `http://localhost:5173` with hot module replacement (HMR).
+
+### Manual Setup
+
 Start the development server with hot module replacement (HMR):
 
 ```bash
@@ -39,6 +55,22 @@ npm run dev
 The application will be available at `http://localhost:5173`
 
 ## Building
+
+### Using Docker
+
+From the repository root:
+
+```bash
+# Build production image
+docker compose build web-ui
+
+# Or build and run
+docker compose up -d web-ui
+```
+
+The application will be available at `http://localhost:3000`
+
+### Manual Build
 
 Build the application for production:
 
