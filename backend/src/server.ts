@@ -26,7 +26,7 @@ export function createApp(): Express {
   });
 
   // Health check endpoint
-  app.get('/health', (req, res) => {
+  app.get('/health', (_req, res) => {
     res.status(200).json({ status: 'healthy' });
   });
 
@@ -34,7 +34,7 @@ export function createApp(): Express {
   app.use('/api/v1', credentialsRouter);
 
   // 404 handler
-  app.use((req, res) => {
+  app.use((_req, res) => {
     res.status(404).json({
       error: 'Not Found',
       message: 'The requested resource was not found',

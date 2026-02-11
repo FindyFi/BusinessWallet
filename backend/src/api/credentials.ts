@@ -56,7 +56,7 @@ router.post('/credentials', async (req: Request, res: Response) => {
  */
 router.get('/credentials/:id', async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const id = typeof req.params.id === 'string' ? req.params.id : req.params.id[0];
     const credential = await credentialRepository.findById(id);
 
     if (!credential) {
