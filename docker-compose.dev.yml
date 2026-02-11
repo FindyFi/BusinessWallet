@@ -7,13 +7,17 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      - ./web-ui:/app
-      - /app/node_modules
+      - ./web-ui/src:/app/src
+      - ./web-ui/public:/app/public
+      - ./web-ui/index.html:/app/index.html
+      - ./web-ui/vite.config.ts:/app/vite.config.ts
+      - ./web-ui/tsconfig.json:/app/tsconfig.json
+      - ./web-ui/tsconfig.app.json:/app/tsconfig.app.json
+      - ./web-ui/tsconfig.node.json:/app/tsconfig.node.json
     environment:
       - NODE_ENV=development
     networks:
       - business-wallet-network
-    command: npm run dev -- --host
     restart: unless-stopped
 
   # PostgreSQL Database (same as production)
