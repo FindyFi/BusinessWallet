@@ -1,0 +1,96 @@
+openapi: 3.0.3
+info:
+  title: Business Wallet API
+  description: |
+    REST API for the Business Wallet system. This API enables organizations to issue, store, 
+    share, and request verifiable credentials and documents.
+    
+    ## Features
+    - Issue digital credentials
+    - Store credentials securely
+    - Share credentials with third parties
+    - Request credentials from others
+    - Multi-tenant support
+    
+    ## Standards
+    - W3C Verifiable Credentials Data Model 2.0
+    - OpenID4VC (OID4VCI, OID4VP)
+    - OAuth 2.0 with OpenID Connect
+  version: 0.1.0
+  contact:
+    name: Business Wallet Team
+  license:
+    name: ISC
+
+servers:
+  - url: http://localhost:3000
+    description: Development server
+  - url: https://api.businesswallet.example.com
+    description: Production server (example)
+
+tags:
+  - name: Health
+    description: Service health and status endpoints
+  - name: Credentials
+    description: Credential management operations (future)
+  - name: Tenants
+    description: Multi-tenant management (future)
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Returns the health status of the API server
+      operationId: getHealth
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: ok
+                timestamp: '2026-02-11T15:30:00.000Z'
+                service: business-wallet-api
+                version: 0.1.0
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - timestamp
+        - service
+        - version
+      properties:
+        status:
+          type: string
+          enum: [ok, degraded, error]
+          description: Overall health status of the service
+          example: ok
+        timestamp:
+          type: string
+          format: date-time
+          description: Current server timestamp in ISO 8601 format
+          example: '2026-02-11T15:30:00.000Z'
+        service:
+          type: string
+          description: Name of the service
+          example: business-wallet-api
+        version:
+          type: string
+          description: API version
+          example: 0.1.0
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: OAuth 2.0 JWT token authentication (to be implemented)
+
+security: []
