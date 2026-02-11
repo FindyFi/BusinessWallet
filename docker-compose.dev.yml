@@ -1,0 +1,44 @@
+services:
+  # Development configuration for web-ui
+  web-ui-dev:
+    build:
+      context: ./web-ui
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./web-ui:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    networks:
+      - business-wallet-network
+    command: npm run dev -- --host
+    restart: unless-stopped
+
+  # PostgreSQL Database (same as production)
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: businesswallet
+      POSTGRES_USER: businesswallet
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - business-wallet-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U businesswallet"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  business-wallet-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
