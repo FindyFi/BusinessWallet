@@ -8,6 +8,7 @@ Business Wallet is a digital wallet system for organizations that enables them t
 
 ## Project Structure
 
+- `backend/` - Node.js + TypeScript backend API for credential issuance and storage
 - `web-ui/` - React + TypeScript web application for the user interface
 
 ## Getting Started
@@ -18,6 +19,32 @@ Business Wallet is a digital wallet system for organizations that enables them t
 - npm (v9 or higher)
 
 ### Installation and Running
+
+#### Backend API
+
+1. Navigate to the backend directory:
+
+```bash
+cd backend
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Start the development server:
+
+```bash
+npm run dev
+```
+
+The API will be available at `http://localhost:3000`
+
+For more detailed information about the backend API, see the [backend/README.md](backend/README.md).
+
+#### Web UI
 
 1. Navigate to the web UI directory:
 
