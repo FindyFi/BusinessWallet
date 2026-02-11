@@ -25,7 +25,7 @@ Manage the implementation of the system requirements by refining the requirement
 ### Initial Setup (First Time Only)
 
 Suggest templates for "Definition of Ready" and "Definition of Done" that can be applied to issues.
-When we agree on the content of these definitions, document them in a new document CONTRIBUTING.md.
+When we agree on the content of these definitions, document them in a new document, CONTRIBUTING.md.
 
 ### For each issue
 
@@ -42,7 +42,8 @@ When you create a new issue, ensure that the following guidelines are met
   - status:In-Progress
   - status:In-Review
   - status:Done
-- The issue description has the "Definition of Ready" and "Definition of Done" templates filled in
+- The issue description has the "Definition of Ready" and "Definition of Done" templates filled in according to the instructions in CONTRIBUTING.md
+- The issue description has links to the architecture.md so that the coding agents implementing the issue can follow the architecture choices and guidelines
 
 When the status of an issue is changed, move the issue to the corresponding column in the project.
 
