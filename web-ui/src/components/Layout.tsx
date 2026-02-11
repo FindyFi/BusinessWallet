@@ -1,4 +1,5 @@
-import { Link, Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
+import Sidebar from './Sidebar';
 import './Layout.css';
 
 export default function Layout() {
@@ -6,20 +7,22 @@ export default function Layout() {
     <div className="layout">
       <header className="header">
         <div className="header-content">
-          <h1 className="title">Business Wallet</h1>
-          <nav className="nav">
-            <Link to="/" className="nav-link">
-              Home
-            </Link>
-            <Link to="/credentials" className="nav-link">
-              Credentials
-            </Link>
-          </nav>
+          <div className="logo-container">
+            <div className="logo">BW</div>
+            <h1 className="title">Business Wallet</h1>
+          </div>
+          <div className="user-section">
+            <span className="user-name">Organization Admin</span>
+            <div className="user-avatar">OA</div>
+          </div>
         </div>
       </header>
-      <main className="main-content">
-        <Outlet />
-      </main>
+      <div className="content-wrapper">
+        <Sidebar />
+        <main className="main-content">
+          <Outlet />
+        </main>
+      </div>
       <footer className="footer">
         <p>&copy; 2026 Business Wallet. All rights reserved.</p>
       </footer>
