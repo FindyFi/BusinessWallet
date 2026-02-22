@@ -14,7 +14,7 @@ interface RecordConstructor<T extends BaseRecord> {
 }
 
 /**
- * Simple in-memory {@link StorageService} implementation for Credo.
+ * Simple in-memory storage service compatible with the Credo {@link StorageService} interface.
  *
  * Stores records as plain JSON objects organised by:
  *   contextCorrelationId → record type → record id

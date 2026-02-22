@@ -31,8 +31,9 @@ async function createAgent(): Promise<Agent> {
   const agent = new Agent(
     {
       config: {
-        // Allow http URLs in development (e.g. for VCT metadata resolution).
-        allowInsecureHttpUrls: true,
+        // Allow http URLs only in development (e.g. for local VCT metadata resolution).
+        // In production this must be false so that all VCT metadata URLs use HTTPS.
+        allowInsecureHttpUrls: process.env.NODE_ENV !== 'production',
         // Automatically migrate the storage schema when the framework version changes.
         autoUpdateStorageOnStartup: true,
       },
