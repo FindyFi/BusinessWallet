@@ -10,11 +10,17 @@
     "lint": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["business-wallet", "api", "verifiable-credentials"],
+  "keywords": [
+    "business-wallet",
+    "api",
+    "verifiable-credentials"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@credo-ts/core": "^0.6.2",
+    "@credo-ts/node": "^0.6.2",
     "express": "^5.2.1"
   },
   "devDependencies": {
