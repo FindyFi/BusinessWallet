@@ -1,4 +1,5 @@
 import express, { Request, Response, Application } from 'express';
+import { credentialsRouter, employeeVcTypeMetadataHandler } from './routes/credentials';
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
@@ -13,6 +14,9 @@ app.get('/health', (_req: Request, res: Response): void => {
     version: '0.1.0'
   });
 });
+
+app.use('/credentials', credentialsRouter);
+app.get('/.well-known/vct/employee', employeeVcTypeMetadataHandler);
 
 app.listen(PORT, (): void => {
   console.log(`Business Wallet API server is running on port ${PORT}`);
