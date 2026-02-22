@@ -32,7 +32,7 @@ tags:
   - name: Health
     description: Service health and status endpoints
   - name: Credentials
-    description: Credential management operations (future)
+    description: Credential management operations
   - name: Tenants
     description: Multi-tenant management (future)
 
@@ -56,6 +56,76 @@ paths:
                 timestamp: '2026-02-11T15:30:00.000Z'
                 service: business-wallet-api
                 version: 0.1.0
+
+  /credentials/employee:
+    post:
+      summary: Issue employee credential
+      description: |
+        Issues an SD-JWT VC employee credential for the specified employee. The credential
+        contains the employee's name, job title, and position dates. All claims support
+        selective disclosure.
+
+        VC Type Metadata for this credential type is available at
+        `/.well-known/vct/employee`.
+      operationId: issueEmployeeCredential
+      tags:
+        - Credentials
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeCredentialRequest'
+            example:
+              firstName: Jane
+              lastName: Doe
+              jobTitle: Software Engineer
+              startDate: '2024-01-15'
+      responses:
+        '201':
+          description: Employee credential issued successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeCredentialResponse'
+        '400':
+          description: Invalid request — missing required fields or invalid date format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Authentication required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Insufficient permissions to issue credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /.well-known/vct/employee:
+    get:
+      summary: Employee credential VC Type Metadata
+      description: |
+        Returns the SD-JWT VC Type Metadata document for the employee credential type,
+        as specified in draft-ietf-oauth-sd-jwt-vc. This document describes the credential
+        structure, display properties, and claim definitions.
+      operationId: getEmployeeVcTypeMetadata
+      tags:
+        - Credentials
+      responses:
+        '200':
+          description: VC Type Metadata document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VcTypeMetadata'
 
 components:
   schemas:
@@ -85,6 +155,143 @@ components:
           type: string
           description: API version
           example: 0.1.0
+
+    EmployeeCredentialRequest:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - jobTitle
+        - startDate
+      properties:
+        firstName:
+          type: string
+          description: The employee's given (first) name
+          example: Jane
+        lastName:
+          type: string
+          description: The employee's family (last) name
+          example: Doe
+        jobTitle:
+          type: string
+          description: The employee's job title or position within the organization
+          example: Software Engineer
+        startDate:
+          type: string
+          format: date
+          description: The date when the employee started in their current position (ISO 8601 YYYY-MM-DD)
+          example: '2024-01-15'
+        endDate:
+          type: string
+          format: date
+          description: The date when the position ended (ISO 8601 YYYY-MM-DD). Omit if the employee is still in the position.
+          example: '2025-12-31'
+
+    EmployeeCredentialResponse:
+      type: object
+      required:
+        - credential
+        - format
+      properties:
+        credential:
+          type: string
+          description: The issued SD-JWT VC credential in compact serialization format
+          example: 'eyJ...~eyJ...~'
+        format:
+          type: string
+          enum: [vc+sd-jwt]
+          description: The credential format
+          example: 'vc+sd-jwt'
+
+    VcTypeMetadata:
+      type: object
+      required:
+        - vct
+        - name
+      description: SD-JWT VC Type Metadata document as specified in draft-ietf-oauth-sd-jwt-vc
+      properties:
+        vct:
+          type: string
+          description: URI uniquely identifying this credential type
+          example: 'https://businesswallet.example.com/credentials/types/employee/v1'
+        name:
+          type: string
+          description: Human-readable name for this credential type
+          example: 'Employee Credential'
+        description:
+          type: string
+          description: Human-readable description of this credential type
+          example: 'A verifiable credential confirming a person''s employment status and role within an organization.'
+        display:
+          type: array
+          description: Localized display information for this credential type
+          items:
+            type: object
+            required:
+              - lang
+              - name
+            properties:
+              lang:
+                type: string
+                description: BCP 47 language tag
+                example: en
+              name:
+                type: string
+                description: Localized credential type name
+                example: 'Employee Credential'
+              description:
+                type: string
+                description: Localized credential type description
+        claims:
+          type: array
+          description: Definitions for each claim in this credential type
+          items:
+            type: object
+            required:
+              - path
+            properties:
+              path:
+                type: array
+                items:
+                  type: string
+                description: JSON path to the claim value
+                example: ['firstName']
+              sd:
+                type: string
+                enum: [always, allowed, never]
+                description: Whether the claim may be selectively disclosed
+                example: allowed
+              display:
+                type: array
+                items:
+                  type: object
+                  required:
+                    - lang
+                    - label
+                  properties:
+                    lang:
+                      type: string
+                      description: BCP 47 language tag
+                      example: en
+                    label:
+                      type: string
+                      description: Localized display label for the claim
+                      example: First Name
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Machine-readable error code
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          description: Human-readable error description
+          example: 'Missing required field: startDate'
 
   securitySchemes:
     BearerAuth:

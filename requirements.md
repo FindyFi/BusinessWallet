@@ -1,7 +1,7 @@
 # Business Wallet Requirements Specification
 
-**Version:** 0.3.0  
-**Last Updated:** 2026-02-07  
+**Version:** 0.4.0  
+**Last Updated:** 2026-02-22  
 **Status:** Draft
 
 ## Document Overview
@@ -128,6 +128,68 @@ As a credential issuer, I want to revoke a credential I previously issued so tha
 
 ---
 
+### FR-0010: Employee Credential Definition
+
+**Description:**  
+The system shall define an employee credential type as an SD-JWT VC. The credential shall contain the following claims:
+
+- `firstName`: The employee's given (first) name — required, selectively disclosable
+- `lastName`: The employee's family (last) name — required, selectively disclosable
+- `jobTitle`: The employee's job title or position within the organization — required, selectively disclosable
+- `startDate`: The date when the employee started in their current position, in ISO 8601 date format (`YYYY-MM-DD`) — required, selectively disclosable
+- `endDate`: The date when the position ended, in ISO 8601 date format (`YYYY-MM-DD`) — optional, selectively disclosable
+
+The credential type shall have publicly accessible VC Type Metadata as specified in TR-0009.
+
+**User Story:**  
+As an organization, I want to issue employee credentials so that employees can prove their employment status and role to third parties.
+
+**Acceptance Criteria:**
+- Given an employee credential definition, when a credential is issued, then it contains all required claims (`firstName`, `lastName`, `jobTitle`, `startDate`)
+- Given an issuance request without `endDate`, when the credential is issued, then the credential is valid without the optional field
+- Given an issuance request with all five claims, when the credential is issued, then all claims are present and selectively disclosable
+
+**Priority:** High  
+**Status:** Proposed  
+**Related Use Cases:** Employee onboarding, employment verification, HR credential management  
+**Dependencies:** TR-0006, TR-0009
+
+---
+
+### FR-0011: Employee Credential Issuance REST API
+
+**Description:**  
+The system shall provide a REST API endpoint for issuing employee credentials. In the first iteration, the issuance interface shall be the REST API only; a web-based user interface is deferred to a later iteration (see FR-0012). The endpoint shall accept employee data as input, validate the data against the employee credential schema (FR-0010), and return an SD-JWT VC employee credential following the design decisions in architecture.md.
+
+**User Story:**  
+As an organization administrator or an integrated HR system, I want to call a REST API to issue an employee credential so that issuance can be automated and integrated with core business systems.
+
+**Acceptance Criteria:**
+- Given an authenticated API client with appropriate permissions, when they POST valid employee data to the credential issuance endpoint, then an SD-JWT VC employee credential is returned
+- Given a request containing all required fields (`firstName`, `lastName`, `jobTitle`, `startDate`), when processed, then the credential is issued successfully
+- Given a request missing a required field, when processed, then the API returns `400 Bad Request` with a descriptive error message
+- Given a request that includes the optional `endDate`, when processed, then the `endDate` is included in the issued credential
+- Given an unauthenticated or unauthorized API call, when received, then the API returns `401 Unauthorized`
+
+**Priority:** High  
+**Status:** Proposed  
+**Related Use Cases:** HR system integration, automated employee onboarding  
+**Dependencies:** FR-0006, FR-0010, TR-0003, TR-0004, TR-0009
+
+---
+
+### FR-0012: Employee Credential Issuance Web UI (Placeholder)
+
+**Description:**  
+In a future iteration, the system shall provide a web-based user interface for issuing employee credentials. Authorized users shall be able to fill in the employee's details and issue a credential through the UI without requiring direct API access. This requirement is a placeholder to be refined when the UI iteration begins.
+
+**Priority:** Low  
+**Status:** Proposed  
+**Related Use Cases:** Manual employee credential issuance by HR staff  
+**Dependencies:** FR-0001, FR-0011
+
+---
+
 ## Technical Requirements
 
 ### TR-0001: Unified Deployment Architecture
@@ -227,6 +289,36 @@ Verification shall be self-contained and not require real-time communication wit
 
 ---
 
+### TR-0009: SD-JWT VC Type Metadata for Employee Credential
+
+**Description:**  
+The employee credential (FR-0010) shall define and publish VC Type Metadata in compliance with the SD-JWT VC specification (draft-ietf-oauth-sd-jwt-vc). The type metadata shall be:
+
+- Identified by a URI used as the `vct` claim value in issued credentials
+- Publicly accessible at the URI specified in the `vct` claim (or at a well-known URL derivable from it per the specification)
+- Expressed as a JSON document containing at minimum:
+  - `vct`: URI uniquely identifying the employee credential type
+  - `name`: Human-readable name (e.g., `"Employee Credential"`)
+  - `description`: Human-readable description of the credential's purpose
+  - `display`: Localized display information for the credential type
+  - `claims`: Definition of each claim including `path`, `display`, and selective disclosure setting (`sd`)
+
+All claims in the employee credential shall be marked as selectively disclosable (`"sd": "allowed"`).
+
+**Rationale:**  
+VC Type Metadata enables verifiers and wallets to understand the credential structure, display it correctly to users, and determine which claims may be selectively disclosed. Publishing type metadata at a well-known URL is required by the SD-JWT VC specification for interoperability with conformant wallets and verifiers.
+
+**Acceptance Criteria:**
+- Given the employee credential type URI, when a client fetches the type metadata URL, then a valid SD-JWT VC type metadata JSON document is returned
+- Given the type metadata document, when inspected, then it contains entries under `claims` for all five fields: `firstName`, `lastName`, `jobTitle`, `startDate`, and `endDate`
+- Given the type metadata document, when inspected, then all claims have `"sd": "allowed"`
+
+**Priority:** High  
+**Status:** Proposed  
+**Related Requirements:** FR-0010, FR-0011, TR-0006
+
+---
+
 ## Glossary
 
 **Business Wallet:** A digital solution enabling organizations to manage, issue, store, share, and request verifiable credentials and documents.
@@ -274,4 +366,8 @@ Verification shall be self-contained and not require real-time communication wit
 **Revocation:** The process by which an issuer invalidates a previously issued credential, making it no longer valid.
 
 **Cryptographic Proof:** Mathematical evidence that a credential was issued by a specific entity and has not been tampered with.
+
+**VC Type Metadata:** A JSON document that describes an SD-JWT VC credential type, including its human-readable name, description, display properties, and claim definitions. Published at a well-known URL and referenced by the `vct` claim in issued credentials per the SD-JWT VC specification.
+
+**vct (Verifiable Credential Type):** A URI claim in an SD-JWT VC that uniquely identifies the credential type and points to its VC Type Metadata document.
 
