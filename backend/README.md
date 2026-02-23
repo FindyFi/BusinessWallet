@@ -108,16 +108,81 @@ Returns the health status of the API server.
 }
 ```
 
+### POST /credentials/employee
+
+Issues an SD-JWT VC employee credential. All claims are wrapped as selective
+disclosures (FR-0008). Returns the credential in compact SD-JWT serialisation
+(`<jwt>~<disclosure1>~…~<disclosureN>~`).
+
+**Request body (required fields: `firstName`, `lastName`, `jobTitle`, `startDate`; optional: `endDate`):**
+
+```json
+{
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "jobTitle": "Software Engineer",
+  "startDate": "2024-01-15"
+}
+```
+
+**Response:** `201 Created`
+
+```json
+{
+  "credential": "eyJ...~eyJ...~eyJ...~eyJ...~eyJ...~",
+  "format": "vc+sd-jwt"
+}
+```
+
+### POST /credentials/employee/verify
+
+Verifies an SD-JWT VC employee credential and returns the selectively disclosed
+claims. The presenter may include any subset of the disclosures to achieve
+selective disclosure (FR-0008).
+
+**Request body:**
+
+```json
+{ "credential": "eyJ...~eyJ...~" }
+```
+
+**Response:** `200 OK`
+
+```json
+{
+  "valid": true,
+  "vct": "https://businesswallet.example.com/credentials/types/employee/v1",
+  "iss": "https://businesswallet.example.com",
+  "iat": 1705286400,
+  "disclosedClaims": { "firstName": "Jane", "jobTitle": "Software Engineer" }
+}
+```
+
+### GET /.well-known/vct/employee
+
+Returns the SD-JWT VC Type Metadata document for the employee credential type
+(TR-0009).
+
+### GET /.well-known/jwks.json
+
+Returns the issuer's JSON Web Key Set (JWKS) for signature verification (TR-0007).
+
 ## Configuration
 
 The following environment variables can be used to configure the server:
 
-- `PORT` - Server port (default: 3000)
+- `PORT` - Server port (default: `3000`)
+- `ISSUER_URI` - Issuer URI embedded in issued credentials (default: `https://businesswallet.example.com`)
+- `ISSUER_PRIVATE_KEY_PEM` - PEM-encoded EC P-256 private key for signing credentials.
+  When unset an ephemeral key is generated at startup (development / test only).
+- `EMPLOYEE_VCT_URI` - URI for the employee credential type (default: `https://businesswallet.example.com/credentials/types/employee/v1`)
 
 Create a `.env` file in the backend directory for local configuration:
 ```
 PORT=3000
+ISSUER_URI=https://businesswallet.example.com
 ```
+
 
 ## Building for Production
 
