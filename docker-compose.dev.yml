@@ -1,4 +1,31 @@
 services:
+  # Backend API - development mode with hot-reload
+  backend-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/tsconfig.json:/app/tsconfig.json
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - WALLET_KEY=${WALLET_KEY:-dev-wallet-key-change-in-production}
+      - WALLET_ID=${WALLET_ID:-business-wallet-dev}
+      - DB_TYPE=postgres
+      - DB_HOST=db:5432
+      - DB_USER=businesswallet
+      - DB_PASSWORD=${DB_PASSWORD:-changeme}
+      - EMPLOYEE_VCT_URI=${EMPLOYEE_VCT_URI:-http://localhost:3001/credentials/types/employee/v1}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - business-wallet-network
+    restart: unless-stopped
+
   # Development configuration for web-ui
   web-ui-dev:
     build:
