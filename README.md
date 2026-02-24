@@ -6,10 +6,19 @@ A Digital Wallet for organizations
 
 Business Wallet is a digital wallet system for organizations that enables them to issue, store, share, and request verifiable credentials and documents. It serves as a versatile communication tool supporting W3C Verifiable Credentials, OpenID4VC protocols, and registered delivery services.
 
+The backend is built on [Credo](https://github.com/openwallet-foundation/credo-ts) (AC-0013), an open-source TypeScript framework by the OpenWallet Foundation, which provides SD-JWT VC issuance, DID management, and key management via Aries Askar.
+
 ## Project Structure
 
-- `backend/` - Node.js + TypeScript REST API server
-- `web-ui/` - React + TypeScript web application for the user interface
+```
+BusinessWallet/
+├── backend/          - Node.js + TypeScript REST API (Credo-based VC operations)
+├── web-ui/           - React + TypeScript web application
+├── architecture.md   - System architecture and design decisions
+├── requirements.md   - Requirements specification
+├── docker-compose.yml     - Production Docker Compose
+└── docker-compose.dev.yml - Development Docker Compose
+```
 
 ## Getting Started
 
@@ -31,7 +40,15 @@ git clone https://github.com/FindyFi/BusinessWallet.git
 cd BusinessWallet
 ```
 
-2. Start all services with a single command:
+2. Copy the environment file and configure secrets:
+
+```bash
+cp .env.example .env
+# Edit .env and set WALLET_KEY to a strong random value:
+#   openssl rand -hex 32
+```
+
+3. Start all services with a single command:
 
 **For Production:**
 ```bash
@@ -43,11 +60,27 @@ docker compose up -d
 docker compose -f docker-compose.dev.yml up
 ```
 
-3. Access the application:
+4. Access the application:
    - Web UI: `http://localhost:3000` (production) or `http://localhost:5173` (development)
-   - PostgreSQL: `localhost:5432` (for future backend integration)
+   - Backend API: `http://localhost:3001` (both modes)
+   - PostgreSQL: `localhost:5432`
 
-4. Stop the services:
+5. Test the backend:
+
+```bash
+# Health check
+curl http://localhost:3001/health
+
+# Issue an employee credential
+curl -X POST http://localhost:3001/credentials/employee \
+  -H "Content-Type: application/json" \
+  -d '{"firstName":"Jane","lastName":"Doe","jobTitle":"Engineer","startDate":"2024-01-15"}'
+
+# Get VC Type Metadata
+curl http://localhost:3001/.well-known/vct/employee
+```
+
+6. Stop the services:
 
 ```bash
 docker compose down
@@ -66,14 +99,20 @@ Copy `.env.example` to `.env` and customize as needed:
 cp .env.example .env
 ```
 
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `WALLET_KEY` | **Yes** | — | Master key for the Askar wallet. Use `openssl rand -hex 32`. |
+| `WALLET_ID` | No | `business-wallet` | Wallet store identifier. |
+| `DB_PASSWORD` | No | `changeme` | PostgreSQL password. |
+| `EMPLOYEE_VCT_URI` | No | Example URI | URI for employee credential type metadata. |
+
 ### Option 2: Manual Setup (Without Docker)
 
 #### Prerequisites
 
-- Node.js (v18 or higher)
+- Node.js (v20 or higher) — required for prebuilt Askar native binaries
 - npm (v9 or higher)
-
-#### Installation and Running
+- PostgreSQL (optional; SQLite is used by default)
 
 #### Backend API
 
@@ -89,7 +128,13 @@ cd backend
 npm install
 ```
 
-3. Start the development server:
+3. Set required environment variables:
+
+```bash
+export WALLET_KEY=$(openssl rand -hex 32)
+```
+
+4. Start the development server:
 
 ```bash
 npm run dev
@@ -132,9 +177,9 @@ For more detailed information about the web UI, see the [web-ui/README.md](web-u
 
 - [Architecture](architecture.md) - System architecture and design decisions
 - [Requirements](requirements.md) - Detailed requirements and specifications
+- [Backend README](backend/README.md) - Backend API, Credo integration, and configuration
 - [Contributing](CONTRIBUTING.md) - Guidelines for contributing to the project
 
 ## License
 
 See [LICENSE](LICENSE) for details.
-

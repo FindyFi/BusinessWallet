@@ -1,10 +1,6 @@
 import { Router, type Request, type Response } from 'express';
-import { EMPLOYEE_VC_TYPE_METADATA } from '../services/employeeCredentialService';
-import {
-  issueEmployeeCredentialSdJwt,
-  verifyEmployeeCredentialSdJwt,
-  getIssuerPublicKeyJwk,
-} from '../services/sdJwtVcService';
+import { EMPLOYEE_VC_TYPE_METADATA, issueEmployeeCredential } from '../services/employeeCredentialService';
+import { getCredoAgent, getIssuerDidUrl } from '../agent/credoAgent';
 import type {
   EmployeeCredentialRequest,
   EmployeeCredentialResponse,
@@ -44,15 +40,13 @@ function isIsoDate(value: string): boolean {
 /**
  * POST /credentials/employee
  *
- * Issues an SD-JWT VC employee credential for the given employee data.
- * All claims are wrapped as selective disclosures (FR-0008, TR-0009).
+ * Issues an SD-JWT VC employee credential for the given employee data using
+ * the Credo framework (AC-0013).  Authentication (TR-0004) is required before
+ * this endpoint is production-ready.
  */
 credentialsRouter.post(
   '/employee',
-  async (
-    req: Request,
-    res: Response<EmployeeCredentialResponse | ErrorResponse>,
-  ): Promise<void> => {
+  async (req: Request, res: Response<EmployeeCredentialResponse | ErrorResponse>): Promise<void> => {
     const body = req.body as Record<string, unknown>;
 
     // Validate required string fields
@@ -113,15 +107,11 @@ credentialsRouter.post(
       ...(endDate !== undefined ? { endDate } : {}),
     };
 
-    try {
-      const credential = await issueEmployeeCredentialSdJwt(credentialRequest);
-      res.status(201).json({ credential, format: 'vc+sd-jwt' });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Credential issuance failed';
-      res.status(500).json({ error: 'ISSUANCE_ERROR', message });
-    }
-  },
-);
+    const credential = await issueEmployeeCredential(
+      getCredoAgent(),
+      getIssuerDidUrl(),
+      credentialRequest,
+    );
 
 /**
  * POST /credentials/employee/verify
@@ -173,15 +163,3 @@ credentialsRouter.post(
 export function employeeVcTypeMetadataHandler(_req: Request, res: Response): void {
   res.status(200).json(EMPLOYEE_VC_TYPE_METADATA);
 }
-
-/**
- * GET /.well-known/jwks.json
- *
- * Returns the issuer's JSON Web Key Set (JWKS), enabling external verifiers to
- * obtain the public key needed to verify employee credential signatures (TR-0007).
- */
-export function jwksHandler(_req: Request, res: Response): void {
-  const jwk = getIssuerPublicKeyJwk();
-  res.status(200).json({ keys: [{ ...jwk, use: 'sig', alg: 'ES256' }] });
-}
-
