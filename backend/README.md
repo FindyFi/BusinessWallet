@@ -172,6 +172,7 @@ Business Wallet uses [Credo](https://github.com/openwallet-foundation/credo-ts) 
 
 Credentials are signed using `agent.sdJwtVc.sign()` with the issuer's `did:key`. All claims are placed in the SD-JWT disclosure frame, enabling selective disclosure per FR-0008 and FR-0010.
 
+
 ## Building for Production
 
 1. Build the TypeScript code:

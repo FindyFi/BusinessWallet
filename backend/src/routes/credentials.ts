@@ -4,6 +4,7 @@ import { getCredoAgent, getIssuerDidUrl } from '../agent/credoAgent';
 import type {
   EmployeeCredentialRequest,
   EmployeeCredentialResponse,
+  EmployeeCredentialVerifyResponse,
   ErrorResponse,
 } from '../types/credentials';
 
@@ -112,7 +113,44 @@ credentialsRouter.post(
       credentialRequest,
     );
 
-    res.status(201).json({ credential, format: 'vc+sd-jwt' });
+/**
+ * POST /credentials/employee/verify
+ *
+ * Verifies an SD-JWT VC employee credential and returns the set of selectively
+ * disclosed claims. The presenter may include any subset of the disclosures
+ * from the originally issued credential.
+ */
+credentialsRouter.post(
+  '/employee/verify',
+  async (
+    req: Request,
+    res: Response<EmployeeCredentialVerifyResponse | ErrorResponse>,
+  ): Promise<void> => {
+    const body = req.body as Record<string, unknown>;
+
+    if (!isNonEmptyString(body['credential'])) {
+      res.status(400).json({
+        error: 'VALIDATION_ERROR',
+        message: 'Missing required field: credential',
+      });
+      return;
+    }
+
+    const sdJwt = body['credential'] as string;
+
+    try {
+      const result = await verifyEmployeeCredentialSdJwt(sdJwt);
+      res.status(200).json({
+        valid: true,
+        vct: result.vct,
+        iss: result.iss,
+        iat: result.iat,
+        disclosedClaims: result.disclosedClaims,
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Credential verification failed';
+      res.status(400).json({ error: 'VERIFICATION_ERROR', message });
+    }
   },
 );
 
