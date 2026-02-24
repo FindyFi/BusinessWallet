@@ -61,6 +61,29 @@ export interface VcTypeMetadata {
   readonly claims?: readonly ClaimDefinition[];
 }
 
+/** Request body for verifying an employee credential. */
+export interface EmployeeCredentialVerifyRequest {
+  /** The SD-JWT VC in compact serialisation format to verify. */
+  readonly credential: string;
+}
+
+/** Response body returned after successfully verifying an employee credential. */
+export interface EmployeeCredentialVerifyResponse {
+  /** Whether the credential signature and disclosures are valid. */
+  readonly valid: true;
+  /** The `vct` claim from the verified credential. */
+  readonly vct: string;
+  /** The `iss` claim (issuer) from the verified credential. */
+  readonly iss: string;
+  /** The `iat` claim (issuance time, Unix epoch seconds) from the verified credential. */
+  readonly iat: number;
+  /**
+   * Claims that were selectively disclosed in the presented SD-JWT.
+   * Only the disclosures included by the presenter are returned.
+   */
+  readonly disclosedClaims: Readonly<Record<string, string>>;
+}
+
 /** Standard error response. */
 export interface ErrorResponse {
   readonly error: string;

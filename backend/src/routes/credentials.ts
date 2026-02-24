@@ -1,8 +1,10 @@
 import { Router, type Request, type Response } from 'express';
-import { EMPLOYEE_VC_TYPE_METADATA } from '../services/employeeCredentialService';
+import { EMPLOYEE_VC_TYPE_METADATA, issueEmployeeCredential } from '../services/employeeCredentialService';
+import { getCredoAgent, getIssuerDidUrl } from '../agent/credoAgent';
 import type {
   EmployeeCredentialRequest,
   EmployeeCredentialResponse,
+  EmployeeCredentialVerifyResponse,
   ErrorResponse,
 } from '../types/credentials';
 
@@ -38,14 +40,13 @@ function isIsoDate(value: string): boolean {
 /**
  * POST /credentials/employee
  *
- * Issues an SD-JWT VC employee credential for the given employee data.
- *
- * Authentication and full cryptographic signing via the Credo framework (AC-0013)
- * are required before this endpoint is ready for production use.
+ * Issues an SD-JWT VC employee credential for the given employee data using
+ * the Credo framework (AC-0013).  Authentication (TR-0004) is required before
+ * this endpoint is production-ready.
  */
 credentialsRouter.post(
   '/employee',
-  (req: Request, res: Response<EmployeeCredentialResponse | ErrorResponse>): void => {
+  async (req: Request, res: Response<EmployeeCredentialResponse | ErrorResponse>): Promise<void> => {
     const body = req.body as Record<string, unknown>;
 
     // Validate required string fields
@@ -106,11 +107,50 @@ credentialsRouter.post(
       ...(endDate !== undefined ? { endDate } : {}),
     };
 
-    // TODO: Replace stub with full SD-JWT VC issuance via Credo (AC-0013) once
-    // key management and the credential signing pipeline are integrated.
-    const credential = issueEmployeeCredentialStub(credentialRequest);
+    const credential = await issueEmployeeCredential(
+      getCredoAgent(),
+      getIssuerDidUrl(),
+      credentialRequest,
+    );
 
-    res.status(201).json({ credential, format: 'vc+sd-jwt' });
+/**
+ * POST /credentials/employee/verify
+ *
+ * Verifies an SD-JWT VC employee credential and returns the set of selectively
+ * disclosed claims. The presenter may include any subset of the disclosures
+ * from the originally issued credential.
+ */
+credentialsRouter.post(
+  '/employee/verify',
+  async (
+    req: Request,
+    res: Response<EmployeeCredentialVerifyResponse | ErrorResponse>,
+  ): Promise<void> => {
+    const body = req.body as Record<string, unknown>;
+
+    if (!isNonEmptyString(body['credential'])) {
+      res.status(400).json({
+        error: 'VALIDATION_ERROR',
+        message: 'Missing required field: credential',
+      });
+      return;
+    }
+
+    const sdJwt = body['credential'] as string;
+
+    try {
+      const result = await verifyEmployeeCredentialSdJwt(sdJwt);
+      res.status(200).json({
+        valid: true,
+        vct: result.vct,
+        iss: result.iss,
+        iat: result.iat,
+        disclosedClaims: result.disclosedClaims,
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Credential verification failed';
+      res.status(400).json({ error: 'VERIFICATION_ERROR', message });
+    }
   },
 );
 
@@ -122,31 +162,4 @@ credentialsRouter.post(
  */
 export function employeeVcTypeMetadataHandler(_req: Request, res: Response): void {
   res.status(200).json(EMPLOYEE_VC_TYPE_METADATA);
-}
-
-/**
- * Stub implementation for employee credential issuance.
- *
- * Returns a placeholder compact SD-JWT VC string that demonstrates the API contract.
- * Production implementation must replace this with Credo-based cryptographic signing.
- */
-function issueEmployeeCredentialStub(request: EmployeeCredentialRequest): string {
-  // Construct a minimal unsigned payload for demonstration purposes.
-  // A real implementation would use Credo to sign this with the issuer's key.
-  const payload = {
-    vct: EMPLOYEE_VC_TYPE_METADATA.vct,
-    firstName: request.firstName,
-    lastName: request.lastName,
-    jobTitle: request.jobTitle,
-    startDate: request.startDate,
-    ...(request.endDate !== undefined ? { endDate: request.endDate } : {}),
-    iss: 'https://businesswallet.example.com',
-    iat: Math.floor(Date.now() / 1000),
-  };
-  const header = Buffer.from(JSON.stringify({ alg: 'ES256', typ: 'vc+sd-jwt' })).toString(
-    'base64url',
-  );
-  const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
-  // Placeholder signature — not cryptographically valid.
-  return `${header}.${body}.UNSIGNED`;
 }
