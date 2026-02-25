@@ -8,7 +8,7 @@ REST API backend for the Business Wallet application, built with Node.js, TypeSc
 - **Language:** TypeScript
 - **Framework:** Express.js v5
 - **VC Framework:** [Credo](https://github.com/openwallet-foundation/credo-ts) (AC-0013) — core SSI/VC library
-- **Key Management:** Aries Askar (via `@hyperledger/aries-askar-nodejs`)
+- **Key Management:** Aries Askar (via `@openwallet-foundation/askar-nodejs`)
 - **Database:** PostgreSQL (production) / SQLite (development default)
 - **API Standard:** OpenAPI 3.0+ (`openapi.yaml`)
 
@@ -164,7 +164,7 @@ Business Wallet uses [Credo](https://github.com/openwallet-foundation/credo-ts) 
 | `@credo-ts/core` | Core agent, SD-JWT VC module, DID management |
 | `@credo-ts/node` | Node.js-specific agent dependencies |
 | `@credo-ts/askar` | Aries Askar wallet & key management module |
-| `@hyperledger/aries-askar-nodejs` | Native Askar bindings for Node.js |
+| `@openwallet-foundation/askar-nodejs` | Native Askar bindings for Node.js |
 
 ### Agent lifecycle
 
