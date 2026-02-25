@@ -43,6 +43,7 @@ services:
       - ./web-ui/tsconfig.node.json:/app/tsconfig.node.json
     environment:
       - NODE_ENV=development
+      - API_PROXY_TARGET=http://backend-dev:3000
     networks:
       - business-wallet-network
     restart: unless-stopped

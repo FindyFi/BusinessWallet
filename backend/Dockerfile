@@ -1,11 +1,11 @@
 # Stage 1: Build TypeScript and native modules
-FROM node:20-alpine AS builder
+FROM node:20 AS builder
 
 WORKDIR /app
 
 # Build tools needed to compile Askar native bindings as a fallback
 # if prebuilt binaries are unavailable for the current platform.
-RUN apk add --no-cache python3 make g++
+RUN apt-get update && apt-get install -y python3 make g++ && rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
 RUN npm ci
@@ -18,7 +18,7 @@ RUN npm run build
 # Stage 2: Lean production image
 # node_modules (including compiled native binaries) are copied from the builder
 # stage so build tools are not present in the final image.
-FROM node:20-alpine
+FROM node:20
 
 WORKDIR /app
 

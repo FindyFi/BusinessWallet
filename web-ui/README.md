@@ -126,10 +126,35 @@ web-ui/
 └── package.json        # Project dependencies and scripts
 ```
 
+## Environment Variables
+
+The dev server includes a built-in proxy: any request to `/credentials/*` is automatically
+forwarded to the backend. No environment variables are required for local development.
+
+| Variable | Description | Default / Notes |
+|---|---|---|
+| `API_PROXY_TARGET` | Backend URL used by the **Vite dev server proxy** (Node.js env var, not a `VITE_` prefix) | `http://localhost:3001` (backend port exposed by `docker-compose.dev.yml`) |
+| `VITE_API_BASE_URL` | Backend base URL embedded in the **production build** (leave unset in dev to use the proxy) | `''` — set at build time for production |
+
+For local development without Docker nothing needs to be configured — start the backend on port 3001 and run `npm run dev`.
+
+When the backend runs on a different host or port, set `API_PROXY_TARGET` before starting the dev server:
+
+```bash
+API_PROXY_TARGET=http://localhost:3001 npm run dev
+```
+
+For a production build, set `VITE_API_BASE_URL` to the backend's public URL:
+
+```bash
+VITE_API_BASE_URL=https://api.example.com npm run build
+```
+
 ## Available Routes
 
 - `/` - Home page
 - `/credentials` - Credentials management page
+- `/issue` - Issue employee verifiable credentials (SD-JWT VC)
 
 ## TypeScript Configuration
 
