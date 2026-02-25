@@ -51,6 +51,11 @@ Use in production after running `npm run build`.
 ### `npm run lint`
 Type-checks the TypeScript code without emitting files.
 
+### `npm test`
+Runs the test suite using [Vitest](https://vitest.dev/). Tests are located under
+`src/services/__tests__/` and `src/routes/__tests__/`. No `WALLET_KEY` or live
+Credo agent is required — all external dependencies are mocked.
+
 ## Getting Started
 
 ### Prerequisites
