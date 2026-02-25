@@ -106,11 +106,20 @@ credentialsRouter.post(
       ...(endDate !== undefined ? { endDate } : {}),
     };
 
-    const credential = await issueEmployeeCredential(
-      getCredoAgent(),
-      getIssuerDidUrl(),
-      credentialRequest,
-    );
+    let credential: string;
+    try {
+      credential = await issueEmployeeCredential(
+        getCredoAgent(),
+        getIssuerDidUrl(),
+        credentialRequest,
+      );
+    } catch {
+      res.status(500).json({
+        error: 'ISSUANCE_ERROR',
+        message: 'Failed to issue employee credential',
+      });
+      return;
+    }
 
     res.status(201).json({ credential, format: 'vc+sd-jwt' });
   },
