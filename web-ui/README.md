@@ -126,10 +126,23 @@ web-ui/
 └── package.json        # Project dependencies and scripts
 ```
 
+## Environment Variables
+
+| Variable | Description | Example |
+|---|---|---|
+| `VITE_API_BASE_URL` | Base URL of the backend REST API (no trailing slash) | `http://localhost:3000` |
+
+Create a `.env.local` file in the `web-ui/` directory to set these for local development:
+
+```
+VITE_API_BASE_URL=http://localhost:3000
+```
+
 ## Available Routes
 
 - `/` - Home page
 - `/credentials` - Credentials management page
+- `/issue` - Issue employee verifiable credentials (SD-JWT VC)
 
 ## TypeScript Configuration
 
