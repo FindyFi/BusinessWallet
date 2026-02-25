@@ -101,6 +101,23 @@ PostgreSQL is included for future backend development:
 
 ## Troubleshooting
 
+### MacOS (Apple Silicon) native module compilation failures
+
+On Apple Silicon Macs (M1/M2/M3), Docker defaults to running `linux/arm64`
+containers. Some native Node.js modules (such as `@2060.io/ref-napi` used by
+the Askar wallet bindings) do not compile successfully for `linux/arm64`.
+
+The development Docker Compose file already pins both services to
+`platform: linux/amd64`, which resolves this by using Rosetta 2 / QEMU
+x86-64 emulation. No additional configuration is required.
+
+If you build the backend image directly without Docker Compose, pass the
+platform flag explicitly:
+
+```bash
+docker build --platform linux/amd64 -f backend/Dockerfile.dev backend/
+```
+
 ### npm install timeouts
 
 The Dockerfiles include increased timeout settings for npm to handle slow network connections:

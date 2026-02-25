@@ -1,6 +1,7 @@
 services:
   # Backend API - development mode with hot-reload
   backend-dev:
+    platform: linux/amd64
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
@@ -28,6 +29,7 @@ services:
 
   # Development configuration for web-ui
   web-ui-dev:
+    platform: linux/amd64
     build:
       context: ./web-ui
       dockerfile: Dockerfile.dev
