@@ -1,2 +1,2 @@
-# BusinessWallet
-A Digital Wallet for organizations
+# Bots
+This branch contains instructions for agents who act as the team members implementing the Business Wallet.
