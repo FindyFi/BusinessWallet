@@ -22,7 +22,7 @@
     "@credo-ts/askar": "0.5.19",
     "@credo-ts/core": "0.5.19",
     "@credo-ts/node": "0.5.19",
-    "@hyperledger/aries-askar-nodejs": "0.2.3",
+    "@openwallet-foundation/askar-nodejs": "0.4.3",
     "express": "^5.2.1"
   },
   "devDependencies": {

@@ -7,7 +7,7 @@ import {
 } from '@credo-ts/core';
 import { agentDependencies } from '@credo-ts/node';
 import { AskarModule, type AskarWalletPostgresStorageConfig } from '@credo-ts/askar';
-import { ariesAskarNodeJS } from '@hyperledger/aries-askar-nodejs';
+import { askarNodeJS } from '@openwallet-foundation/askar-nodejs';
 
 /** Credo agent type specialised with the AskarModule. */
 export type CredoAgent = Agent<{ askar: AskarModule }>;
@@ -119,7 +119,7 @@ export async function initializeCredoAgent(): Promise<void> {
   agent = new Agent({
     config,
     dependencies: agentDependencies,
-    modules: { askar: new AskarModule({ ariesAskar: ariesAskarNodeJS }) },
+    modules: { askar: new AskarModule({ ariesAskar: askarNodeJS }) },
   });
 
   await agent.initialize();
