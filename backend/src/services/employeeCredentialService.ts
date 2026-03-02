@@ -79,7 +79,7 @@ export async function issueEmployeeCredential(
 ): Promise<string> {
   // Build the payload; iss is the bare DID (without the fragment/key reference)
   const issuerDid = issuerDidUrl.split('#')[0];
-  const payload: Record<string, unknown> = {
+  const payload: { vct: string } & Record<string, unknown> = {
     vct: EMPLOYEE_VCT_URI,
     iss: issuerDid,
     iat: Math.floor(Date.now() / 1000),
@@ -98,6 +98,7 @@ export async function issueEmployeeCredential(
     payload,
     issuer: { method: 'did', didUrl: issuerDidUrl },
     disclosureFrame: { _sd: sdClaims },
+    headerType: 'vc+sd-jwt',
   });
 
   return compact;
