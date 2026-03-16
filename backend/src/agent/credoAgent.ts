@@ -59,10 +59,13 @@ function extractVerificationMethodId(
 async function resolveIssuerDidUrl(credoAgent: CredoAgent): Promise<string> {
   const existingDids = await credoAgent.dids.getCreatedDids({ method: 'key' });
   if (existingDids.length > 0) {
-    return extractVerificationMethodId(
-      existingDids[0].didDocument,
-      'existing did:key',
-    );
+    // In Credo 0.6.x, DidRecord.didDocument is not stored for did:key
+    // (it is deterministically derivable from the DID itself), so we
+    // resolve the document from the DID string when it is missing.
+    const didDocument =
+      existingDids[0].didDocument ??
+      await credoAgent.dids.resolveDidDocument(existingDids[0].did);
+    return extractVerificationMethodId(didDocument, 'existing did:key');
   }
 
   const result = await credoAgent.dids.create({
