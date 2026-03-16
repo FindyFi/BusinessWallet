@@ -1,12 +1,6 @@
-import {
-  Agent,
-  InitConfig,
-  KeyDerivationMethod,
-  KeyType,
-  type WalletStorageConfig,
-} from '@credo-ts/core';
+import { Agent } from '@credo-ts/core';
 import { agentDependencies } from '@credo-ts/node';
-import { AskarModule, type AskarWalletPostgresStorageConfig } from '@credo-ts/askar';
+import { AskarModule, type AskarPostgresStorageConfig } from '@credo-ts/askar';
 import { askar } from '@openwallet-foundation/askar-nodejs';
 
 /** Credo agent type specialised with the AskarModule. */
@@ -16,16 +10,16 @@ let agent: CredoAgent | undefined;
 let issuerDidUrl: string | undefined;
 
 /**
- * Builds the Askar storage config from environment variables.
+ * Builds the Askar database config from environment variables.
  *
  * When `DB_TYPE=postgres`, a PostgreSQL-backed store is used (suitable for
  * production and Docker Compose). Otherwise SQLite is used (default, useful
  * for local development without Docker).
  */
-function buildStorageConfig(): WalletStorageConfig | undefined {
+function buildDatabaseConfig(): AskarPostgresStorageConfig | undefined {
   if (process.env['DB_TYPE'] !== 'postgres') return undefined;
 
-  const storageConfig: AskarWalletPostgresStorageConfig = {
+  const databaseConfig: AskarPostgresStorageConfig = {
     type: 'postgres',
     config: {
       host: process.env['DB_HOST'] ?? 'localhost:5432',
@@ -35,7 +29,7 @@ function buildStorageConfig(): WalletStorageConfig | undefined {
       password: process.env['DB_PASSWORD'] ?? '',
     },
   };
-  return storageConfig;
+  return databaseConfig;
 }
 
 /**
@@ -65,15 +59,18 @@ function extractVerificationMethodId(
 async function resolveIssuerDidUrl(credoAgent: CredoAgent): Promise<string> {
   const existingDids = await credoAgent.dids.getCreatedDids({ method: 'key' });
   if (existingDids.length > 0) {
-    return extractVerificationMethodId(
-      existingDids[0].didDocument,
-      'existing did:key',
-    );
+    // In Credo 0.6.x, DidRecord.didDocument is not stored for did:key
+    // (it is deterministically derivable from the DID itself), so we
+    // resolve the document from the DID string when it is missing.
+    const didDocument =
+      existingDids[0].didDocument ??
+      await credoAgent.dids.resolveDidDocument(existingDids[0].did);
+    return extractVerificationMethodId(didDocument, 'existing did:key');
   }
 
   const result = await credoAgent.dids.create({
     method: 'key',
-    options: { keyType: KeyType.P256 },
+    options: { createKey: { type: { kty: 'EC', crv: 'P-256' } } },
   });
 
   if (result.didState.state !== 'finished') {
@@ -104,22 +101,21 @@ export async function initializeCredoAgent(): Promise<void> {
     );
   }
 
-  const storage = buildStorageConfig();
-
-  const config: InitConfig = {
-    label: 'Business Wallet',
-    walletConfig: {
-      id: process.env['WALLET_ID'] ?? 'business-wallet',
-      key: walletKey,
-      keyDerivationMethod: KeyDerivationMethod.Argon2IInt,
-      ...(storage ? { storage } : {}),
-    },
-  };
+  const database = buildDatabaseConfig();
 
   agent = new Agent({
-    config,
     dependencies: agentDependencies,
-    modules: { askar: new AskarModule({ ariesAskar: askar }) },
+    modules: {
+      askar: new AskarModule({
+        askar,
+        store: {
+          id: process.env['WALLET_ID'] ?? 'business-wallet',
+          key: walletKey,
+          keyDerivationMethod: 'kdf:argon2i:int',
+          ...(database ? { database } : {}),
+        },
+      }),
+    },
   });
 
   await agent.initialize();
